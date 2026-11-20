@@ -40,7 +40,7 @@ All inputs are configurable from the indicator's settings panel.
 
 ### Daily Separators
 
-Vertical dotted lines marking the start of each new Daily Timeframe period.
+Vertical lines marking the start of each new Daily Timeframe period.
 
 ![Vertical line separators on a 1-hour chart](./assets/View-1.png)
 
