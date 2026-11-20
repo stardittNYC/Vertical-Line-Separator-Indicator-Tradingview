@@ -1,0 +1,63 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © MadMataTrader
+//@version=6
+indicator("Vertical Line Separator", overlay = true, max_bars_back = 500, max_lines_count = 500, max_boxes_count = 500, max_labels_count = 500)
+
+//---------------------------------------------------------------------------------------------------------------------}
+// Constants
+//---------------------------------------------------------------------------------------------------------------------{
+string ONE_HOUR   = "1h"
+string FOUR_HOUR  = "4h"
+string SEVEN_HOUR = "7h"
+string DAILY      = "Daily"
+string WEEKLY     = "Weekly"
+string MONTHLY    = "Monthly"
+string QUARTERLY  = "Quarterly"
+
+string DOTTED     = "Dotted"
+string SOLID      = "Solid"
+string DASHED     = "Dashed"
+
+string SEPARATOR_GROUP = "Separator"
+
+string showSeparatorTooltip       = "Draw a vertical divider line each time a new separator period begins."
+string separatorResolutionTooltip = "Select the period used to place the divider lines."
+string separatorColorTooltip      = "Select the color used for the divider lines."
+string separatorStyleTooltip      = "Set the line style used for the divider lines."
+string separatorWidthTooltip      = "Set the line width used for the divider lines."
+
+//---------------------------------------------------------------------------------------------------------------------}
+// Inputs
+//---------------------------------------------------------------------------------------------------------------------{
+bool   showSeparatorInput       = input.bool(true, "Show Separator", group = SEPARATOR_GROUP, tooltip = showSeparatorTooltip, inline = "separator")
+color  separatorColorInput      = input.color(color.black, "", group = SEPARATOR_GROUP, tooltip = separatorColorTooltip, inline = "separator")
+string separatorResolutionInput = input.string(DAILY, "Separator Period", options = [ONE_HOUR, FOUR_HOUR, SEVEN_HOUR, DAILY, WEEKLY, MONTHLY, QUARTERLY], group = SEPARATOR_GROUP, tooltip = separatorResolutionTooltip)
+string separatorStyleInput      = input.string(DOTTED, "Line Style", options = [DOTTED, SOLID, DASHED], group = SEPARATOR_GROUP, tooltip = separatorStyleTooltip)
+int    separatorWidthInput      = input.int(1, "Line Width", minval = 1, maxval = 5, group = SEPARATOR_GROUP, tooltip = separatorWidthTooltip)
+
+//---------------------------------------------------------------------------------------------------------------------}
+// Parsed settings
+//---------------------------------------------------------------------------------------------------------------------{
+var parsedSeparatorResolution = switch separatorResolutionInput
+    ONE_HOUR   => "60"
+    FOUR_HOUR  => "240"
+    SEVEN_HOUR => "420"
+    DAILY      => "D"
+    WEEKLY     => "W"
+    MONTHLY    => "M"
+    QUARTERLY  => "3M"
+
+var parsedSeparatorStyle = switch separatorStyleInput
+    SOLID  => line.style_solid
+    DASHED => line.style_dashed
+    DOTTED => line.style_dotted
+
+int barNumber = bar_index
+
+//---------------------------------------------------------------------------------------------------------------------}
+// Separator
+//---------------------------------------------------------------------------------------------------------------------{
+bool isNewSeparatorPeriod = not barstate.isfirst and ta.change(time(parsedSeparatorResolution)) != 0
+
+if showSeparatorInput and isNewSeparatorPeriod
+    line.new(barNumber, high, barNumber, low, extend = extend.both, color = separatorColorInput, style = parsedSeparatorStyle, width = separatorWidthInput)
